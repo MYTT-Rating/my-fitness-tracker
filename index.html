@@ -1,0 +1,367 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MY FITNESS | Workout Tracker</title>
+
+<style>
+:root {
+  --bg:#090b09;
+  --card:#171b17;
+  --green:#a3ff12;
+  --muted:#929b91;
+  --border:#303a2e;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:white;
+  font-family:Arial,sans-serif;
+}
+header{
+  padding:22px 5%;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.logo{font-size:25px;font-weight:900}
+.logo span{color:var(--green)}
+nav{display:flex;gap:20px}
+nav button,.back{
+  background:none;border:0;color:white;cursor:pointer;
+}
+main{max-width:1250px;margin:auto;padding:35px 5%}
+h1{font-size:36px;margin-bottom:8px}
+.muted{color:var(--muted)}
+.stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:15px;margin:28px 0;
+}
+.stat,.muscle,.panel{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:20px;
+}
+.stat strong{display:block;color:var(--green);font-size:27px;margin-top:8px}
+.grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:18px;
+}
+.muscle{
+  cursor:pointer;transition:.2s;overflow:hidden;
+}
+.muscle:hover{
+  border-color:var(--green);transform:translateY(-3px);
+}
+.muscle .symbol{font-size:38px;color:var(--green)}
+.muscle h2{margin:12px 0 5px}
+.muscle p{color:var(--muted);margin:0;font-size:13px}
+button.primary{
+  background:var(--green);color:#111;font-weight:bold;
+  border:0;padding:12px 20px;border-radius:8px;cursor:pointer;
+}
+button.secondary{
+  background:#252b24;color:white;border:1px solid var(--border);
+  padding:11px 16px;border-radius:8px;cursor:pointer;
+}
+input,select{
+  background:#101410;color:white;border:1px solid var(--border);
+  padding:12px;border-radius:7px;width:100%;margin-top:7px;
+}
+label{font-size:13px;color:var(--muted)}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.setrow{
+  display:grid;grid-template-columns:45px 1fr 1fr;
+  gap:10px;align-items:center;margin:12px 0;
+}
+.setnumber{color:var(--green);font-weight:bold}
+.exercise{
+  padding:16px;margin:10px 0;background:var(--card);
+  border:1px solid var(--border);border-radius:9px;
+  display:flex;justify-content:space-between;align-items:center;
+  cursor:pointer;
+}
+.hidden{display:none!important}
+.historyitem{
+  padding:15px;border-bottom:1px solid var(--border);
+}
+footer{text-align:center;padding:30px;color:var(--muted);font-size:12px}
+@media(max-width:700px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .stats{grid-template-columns:1fr}
+  h1{font-size:27px}
+  nav{gap:8px}
+}
+@media(max-width:430px){
+  .grid{grid-template-columns:1fr 1fr}
+  main{padding:25px 4%}
+  .muscle{padding:13px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">MY <span>FITNESS</span></div>
+  <nav>
+    <button onclick="showHome()">Dashboard</button>
+    <button onclick="showHistory()">History</button>
+  </nav>
+</header>
+
+<main>
+
+<section id="home">
+  <p style="color:var(--green);letter-spacing:3px">
+    TRACK · TRAIN · PROGRESS
+  </p>
+  <h1>Choose Your Muscle Group</h1>
+  <p class="muted">Select a body part and start your workout.</p>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="muted">Total Workouts</span>
+      <strong id="total">0</strong>
+    </div>
+    <div class="stat">
+      <span class="muted">Last Training</span>
+      <strong id="last">--</strong>
+    </div>
+    <div class="stat">
+      <span class="muted">Muscle Groups</span>
+      <strong>06</strong>
+    </div>
+  </div>
+
+  <div class="grid" id="muscleGrid"></div>
+</section>
+
+<section id="training" class="hidden">
+  <button class="secondary" onclick="showHome()">← Back</button>
+  <p style="color:var(--green)">WORKOUT SESSION</p>
+  <h1 id="muscleTitle">Chest</h1>
+  <p class="muted">Select an exercise to record your training.</p>
+
+  <div class="panel">
+    <h3>Recent Training</h3>
+    <div id="recent" class="muted">No training records yet.</div>
+  </div>
+
+  <h2>Exercise List</h2>
+  <div id="exerciseList"></div>
+</section>
+
+<section id="record" class="hidden">
+  <button class="secondary" onclick="showTraining()">← Back</button>
+  <h1 id="exerciseTitle">Bench Press</h1>
+  <p class="muted">Record your sets, weight and repetitions.</p>
+
+  <div class="panel">
+    <div class="setrow">
+      <div class="setnumber">SET</div>
+      <label>WEIGHT (KG)</label>
+      <label>REPS</label>
+    </div>
+    <div id="sets"></div>
+    <button class="secondary" onclick="addSet()">+ Add Set</button>
+  </div>
+
+  <br>
+  <button class="primary" onclick="saveWorkout()">SAVE WORKOUT</button>
+</section>
+
+<section id="history" class="hidden">
+  <button class="secondary" onclick="showHome()">← Back</button>
+  <h1>Workout History</h1>
+  <div class="panel" id="historyList">No workouts recorded yet.</div>
+</section>
+
+</main>
+
+<footer>MY FITNESS · TRAIN SMARTER · GET STRONGER</footer>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzwVG5ROqxIwyQ8xcs4q2Be8svl_NjuU7fXIAgEO9huGb1h2yTfRRzM8B8cCD0HyRJa/exec;
+
+const groups = [
+  {name:"Chest",cn:"胸部",icon:"🏋️"},
+  {name:"Shoulders",cn:"肩部",icon:"💪"},
+  {name:"Back",cn:"背部",icon:"🏋️"},
+  {name:"Arms",cn:"胳膊",icon:"💪"},
+  {name:"Legs",cn:"下肢",icon:"🦵"},
+  {name:"Core",cn:"核心肌群",icon:"🔥"}
+];
+
+const defaultExercises = {
+  Chest:["Bench Press","Incline Dumbbell Press","Chest Fly","Cable Crossover"],
+  Shoulders:["Shoulder Press","Lateral Raise","Front Raise","Rear Delt Fly"],
+  Back:["Lat Pulldown","Seated Cable Row","Bent Over Row","Pull Ups","Face Pull"],
+  Arms:["Barbell Curl","Hammer Curl","Tricep Pushdown","Skull Crushers","Preacher Curl"],
+  Legs:["Squat","Leg Press","Leg Extension","Leg Curl","Calf Raise"],
+  Core:["Crunches","Plank","Hanging Leg Raises","Russian Twists","Cable Crunches","Ab Wheel Rollout"]
+};
+
+let muscle = "";
+let exercise = "";
+let setCount = 3;
+let exercises = defaultExercises;
+let records = JSON.parse(localStorage.getItem("myFitnessRecords") || "[]");
+
+function renderHome(){
+  document.getElementById("muscleGrid").innerHTML =
+    groups.map(g=>`
+      <div class="muscle" onclick="openMuscle('${g.name}')">
+        <div class="symbol">${g.icon}</div>
+        <h2>${g.name}</h2>
+        <p>${g.cn} · ${defaultExercises[g.name].length} Exercises</p>
+      </div>
+    `).join("");
+
+  document.getElementById("total").textContent=records.length;
+  document.getElementById("last").textContent=
+    records.length ? records[0].date : "--";
+}
+
+function hideAll(){
+  ["home","training","record","history"].forEach(id=>
+    document.getElementById(id).classList.add("hidden")
+  );
+}
+
+function showHome(){
+  hideAll();
+  document.getElementById("home").classList.remove("hidden");
+  renderHome();
+}
+
+function openMuscle(name){
+  muscle=name;
+  document.getElementById("muscleTitle").textContent=name;
+  document.getElementById("exerciseList").innerHTML=
+    exercises[name].map(e=>`
+      <div class="exercise" onclick="openExercise('${e.replace(/'/g,"\\'")}')">
+        <strong>${e}</strong><span style="color:var(--green)">→</span>
+      </div>
+    `).join("");
+
+  document.getElementById("recent").innerHTML=
+    records.filter(r=>r.muscle===name).slice(0,5)
+    .map(r=>`<div class="historyitem">${r.exercise} · ${r.date}</div>`)
+    .join("") || "No training records yet.";
+
+  hideAll();
+  document.getElementById("training").classList.remove("hidden");
+}
+
+function showTraining(){openMuscle(muscle)}
+
+function openExercise(name){
+  exercise=name;
+  setCount=3;
+  document.getElementById("exerciseTitle").textContent=name;
+  renderSets();
+  hideAll();
+  document.getElementById("record").classList.remove("hidden");
+}
+
+function renderSets(){
+  document.getElementById("sets").innerHTML=
+    Array.from({length:setCount},(_,i)=>`
+      <div class="setrow">
+        <div class="setnumber">${i+1}</div>
+        <input type="number" min="0" step="0.5" placeholder="Weight">
+        <input type="number" min="1" step="1" placeholder="Reps">
+      </div>
+    `).join("");
+}
+
+function addSet(){
+  setCount++;
+  renderSets();
+}
+
+async function saveWorkout(){
+  const rows=[...document.querySelectorAll("#sets .setrow")].slice(1);
+  const sets=rows.map(row=>{
+    const inputs=row.querySelectorAll("input");
+    return {weight:inputs[0].value,reps:inputs[1].value};
+  });
+
+  if(sets.some(s=>s.weight===""||s.reps===""||
+    Number(s.weight)<0||Number(s.reps)<=0)){
+    alert("Please enter valid weight and reps for every set.");
+    return;
+  }
+
+  const workout={
+    muscle:muscle,
+    exercise:exercise,
+    sets:sets,
+    date:new Date().toLocaleDateString()
+  };
+
+  records.unshift(workout);
+  localStorage.setItem("myFitnessRecords",JSON.stringify(records));
+
+  if(API_URL.startsWith("https://")){
+    try{
+      const response=await fetch(API_URL,{
+        method:"POST",
+        headers:{"Content-Type":"text/plain;charset=utf-8"},
+        body:JSON.stringify({
+          action:"saveWorkout",
+          muscleGroup:muscle,
+          exercise:exercise,
+          sets:sets
+        })
+      });
+      const result=await response.json();
+      if(!result.success) throw new Error(result.error);
+      alert("Workout saved to Google Sheets!");
+    }catch(error){
+      console.error(error);
+      alert("Saved locally. Google Sheets connection needs checking.");
+    }
+  }else{
+    alert("Workout saved in this browser. API connection is not configured yet.");
+  }
+
+  showHome();
+}
+
+function showHistory(){
+  hideAll();
+  document.getElementById("history").classList.remove("hidden");
+  document.getElementById("historyList").innerHTML=
+    records.map(r=>`
+      <div class="historyitem">
+        <strong>${r.muscle} · ${r.exercise}</strong>
+        <p class="muted">${r.date}</p>
+        ${r.sets.map((s,i)=>`Set ${i+1}: ${s.weight}kg × ${s.reps} reps`).join("<br>")}
+      </div>
+    `).join("") || "No workouts recorded yet.";
+}
+
+async function loadExercises(){
+  if(!API_URL.startsWith("https://")) return;
+  try{
+    const response=await fetch(API_URL+"?action=exercises");
+    const result=await response.json();
+    if(result.success){
+      exercises={};
+      groups.forEach(g=>exercises[g.name]=[]);
+      result.data.forEach(item=>{
+        if(exercises[item.muscleGroup])
+          exercises[item.muscleGroup].push(item.exerciseName);
+      });
+      renderHome();
+    }
+  }catch(error){
+    console.log("Using default exercise list:",error);
+  }
+}
+
+renderHome();
+loadExercises();
+</script>
+
+</body>
+</html>
